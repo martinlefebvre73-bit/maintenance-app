@@ -160,4 +160,552 @@ textarea{
 
 <td>
 
-<label>Date</
+<label>Date</label>
+<input type="date" id="date">
+
+</td>
+
+<td>
+
+<label>Horaire</label>
+
+<select id="horaire">
+<option>Jour</option>
+<option>Soir</option>
+<option>Nuit</option>
+<option>07h00 - 15h00</option>
+<option>15h00 - 23h00</option>
+<option>23h00 - 07h00</option>
+</select>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td colspan="2">
+
+<label>Nom</label>
+
+<div style="display:flex;gap:10px;align-items:center;">
+
+<input type="text" id="nom">
+
+<button
+type="button"
+class="voice-btn"
+onclick="startDictation('nom')">
+🎤
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+</table>
+
+<div class="section-box">
+
+<div class="section-title">
+Sujets traités
+</div>
+
+<div class="section-content">
+
+<div class="checkbox-grid">
+
+<label><input type="checkbox"> Appels de service complétés</label>
+<label><input type="checkbox"> Inspection générale</label>
+<label><input type="checkbox"> Intervention d'urgence</label>
+<label><input type="checkbox"> Suivi travaux en cours</label>
+<label><input type="checkbox"> Vérification équipements mécaniques</label>
+<label><input type="checkbox"> Vérification systèmes électriques</label>
+<label><input type="checkbox"> Nettoyage / entretien installations</label>
+<label><input type="checkbox"> Autre</label>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="sections"></div>
+
+<div class="signature-container">
+
+<div class="signature-title">
+Signature
+</div>
+
+<canvas
+id="signature"
+class="signature-box">
+</canvas>
+
+</div>
+
+<div class="actions">
+
+<button
+class="btn-sign"
+onclick="clearSignature()">
+Effacer Signature
+</button>
+
+<button
+class="btn-clear"
+onclick="clearForm()">
+Effacer Formulaire
+</button>
+
+<button
+class="btn-save"
+onclick="savePDF()">
+Sauvegarder PDF
+</button>
+
+</div>
+
+<script>
+
+document.getElementById("date").value =
+new Date().toISOString().substring(0,10);
+
+const sections = [
+
+["serviceCompletes","Appels de service complétés"],
+["interventions","Appels de service / Interventions"],
+["piscine","Particularités / Piscine"],
+["urgence","Intervention d'urgence"],
+["travaux","Suivi travaux en cours"],
+["observations","Autres observations"],
+["details","Détails et Variants"]
+
+];
+
+const container =
+document.getElementById("sections");
+
+sections.forEach(section=>{
+
+container.innerHTML += `
+
+<div class="section-box">
+
+<div class="section-title">
+${section[1]}
+</div>
+
+<div class="section-content">
+
+<textarea id="${section[0]}"></textarea>
+
+<button
+type="button"
+class="voice-btn"
+onclick="startDictation('${section[0]}')">
+
+🎤 Dictée vocale
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+function startDictation(id){
+
+if(!('webkitSpeechRecognition' in window)){
+alert("Dictée vocale non disponible");
+return;
+}
+
+const recognition =
+new webkitSpeechRecognition();
+
+recognition.lang = "fr-CA";
+recognition.continuous = false;
+recognition.interimResults = false;
+
+recognition.onresult = function(event){
+
+const texte =
+event.results[0][0].transcript;
+
+const champ =
+document.getElementById(id);
+
+if(champ.tagName==="TEXTAREA"){
+champ.value += texte + "\n";
+}else{
+champ.value = texte;
+}
+
+};
+
+recognition.start();
+
+}
+
+const canvas =
+document.getElementById("signature");
+
+const ctx =
+canvas.getContext("2d");
+
+function resizeCanvas(){
+
+const ratio =
+window.devicePixelRatio || 1;
+
+canvas.width =
+canvas.offsetWidth * ratio;
+
+canvas.height =
+canvas.offsetHeight * ratio;
+
+ctx.setTransform(ratio,0,0,ratio,0,0);
+
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+ctx.strokeStyle = "#000";
+
+}
+
+resizeCanvas();
+
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+let dessin = false;
+
+function getPoint(event){
+
+const rect =
+canvas.getBoundingClientRect();
+
+if(event.touches){
+
+return {
+x:event.touches[0].clientX - rect.left,
+y:event.touches[0].clientY - rect.top
+};
+
+}
+
+return {
+x:event.clientX - rect.left,
+y:event.clientY - rect.top
+};
+
+}
+
+function debutSignature(event){
+
+event.preventDefault();
+
+dessin = true;
+
+const point =
+getPoint(event);
+
+ctx.beginPath();
+ctx.moveTo(point.x,point.y);
+
+}
+
+function signer(event){
+
+if(!dessin) return;
+
+event.preventDefault();
+
+const point =
+getPoint(event);
+
+ctx.lineTo(point.x,point.y);
+ctx.stroke();
+
+}
+
+function finSignature(event){
+
+event.preventDefault();
+
+dessin = false;
+
+ctx.beginPath();
+
+}
+
+canvas.addEventListener("mousedown",debutSignature);
+canvas.addEventListener("mousemove",signer);
+canvas.addEventListener("mouseup",finSignature);
+canvas.addEventListener("mouseleave",finSignature);
+
+canvas.addEventListener(
+"touchstart",
+debutSignature,
+{passive:false}
+);
+
+canvas.addEventListener(
+"touchmove",
+signer,
+{passive:false}
+);
+
+canvas.addEventListener(
+"touchend",
+finSignature,
+{passive:false}
+);
+
+function clearSignature(){
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+}
+
+function signatureExiste(){
+
+const blank =
+document.createElement("canvas");
+
+blank.width = canvas.width;
+blank.height = canvas.height;
+
+return (
+canvas.toDataURL() !==
+blank.toDataURL()
+);
+
+}
+
+function clearForm(){
+
+document
+.querySelectorAll("textarea")
+.forEach(el=>el.value="");
+
+document
+.querySelectorAll("input[type=text]")
+.forEach(el=>el.value="");
+
+document
+.querySelectorAll("input[type=checkbox]")
+.forEach(el=>el.checked=false);
+
+document.getElementById("horaire").selectedIndex = 0;
+
+document.getElementById("date").value =
+new Date().toISOString().substring(0,10);
+
+clearSignature();
+
+}
+
+async function savePDF(){
+
+if(!signatureExiste()){
+
+alert(
+"Veuillez signer avant de sauvegarder."
+);
+
+return;
+
+}
+
+const { jsPDF } = window.jspdf;
+
+const pdf = new jsPDF(
+"p",
+"mm",
+"letter"
+);
+
+let y = 15;
+
+pdf.setFontSize(18);
+
+pdf.text(
+"RAPPORT DE FIN DE QUART - MAINTENANCE",
+15,
+y
+);
+
+y += 12;
+
+pdf.setFontSize(11);
+
+pdf.text(
+`Date : ${document.getElementById("date").value}`,
+15,
+y
+);
+
+y += 7;
+
+pdf.text(
+`Horaire : ${document.getElementById("horaire").value}`,
+15,
+y
+);
+
+y += 7;
+
+pdf.text(
+`Nom : ${document.getElementById("nom").value}`,
+15,
+y
+);
+
+y += 10;
+
+const sujets = [];
+
+document
+.querySelectorAll('.checkbox-grid input[type="checkbox"]')
+.forEach(cb=>{
+
+if(cb.checked){
+
+sujets.push(
+cb.parentElement.textContent.trim()
+);
+
+}
+
+});
+
+pdf.setFont(undefined,"bold");
+
+pdf.text(
+"Sujets traités :",
+15,
+y
+);
+
+pdf.setFont(undefined,"normal");
+
+y += 6;
+
+const lignesSujets =
+pdf.splitTextToSize(
+sujets.join(", ") || "Aucun",
+170
+);
+
+pdf.text(
+lignesSujets,
+15,
+y
+);
+
+y += lignesSujets.length * 5 + 8;
+
+sections.forEach(section=>{
+
+const texte =
+document.getElementById(
+section[0]
+).value || "-";
+
+if(y > 220){
+
+pdf.addPage();
+y = 15;
+
+}
+
+pdf.setFont(undefined,"bold");
+
+pdf.text(
+section[1],
+15,
+y
+);
+
+pdf.setFont(undefined,"normal");
+
+y += 6;
+
+const lignes =
+pdf.splitTextToSize(
+texte,
+170
+);
+
+pdf.text(
+lignes,
+15,
+y
+);
+
+y += lignes.length * 5 + 8;
+
+});
+
+if(y > 180){
+
+pdf.addPage();
+y = 15;
+
+}
+
+pdf.setFont(undefined,"bold");
+
+pdf.text(
+"Signature",
+15,
+y
+);
+
+y += 8;
+
+const signature =
+canvas.toDataURL("image/png");
+
+pdf.addImage(
+signature,
+"PNG",
+15,
+y,
+70,
+35
+);
+
+const nom =
+document.getElementById("nom").value || "Utilisateur";
+
+const fichier =
+`Rapport_Maintenance_${document.getElementById("date").value}_${nom}.pdf`;
+
+pdf.save(fichier);
+
+alert(
+"PDF sauvegardé avec succès."
+);
+
+}
+
+</script>
+
+</body>
+</html>
