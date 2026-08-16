@@ -171,8 +171,25 @@ textarea{
 <tr>
 
 <td colspan="2">
+
 <label>Nom</label>
-<input type="text" id="nom">
+
+<div style="display:flex;gap:10px;align-items:center;">
+
+<input
+type="text"
+id="nom"
+style="flex:1;">
+
+<button
+type="button"
+class="voice-btn"
+onclick="startDictationNom()">
+🎤 Dicter le nom
+</button>
+
+</div>
+
 </td>
 
 </tr>
