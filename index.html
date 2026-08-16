@@ -6,9 +6,23 @@
 
 <title>Rapport de Fin de Quart</title>
 
-<script src="https://cdnjs.cloudflare.com/l2canvas/1.4.1/html2canvas.min.js
+@media print {
 
-.5.1/jspdf.umd.min.js"></script>
+    .actions,
+    .voice {
+        display:none !important;
+    }
+
+    body{
+        background:white;
+        margin:0;
+    }
+
+    .section{
+        page-break-inside:avoid;
+    }
+
+}
 <style>
 
 body{
@@ -385,7 +399,7 @@ Effacer Signature
 
 <button
 class="btn pdf"
-onclick="enregistrerPDF()">
+onclick="window.print()">
 Enregistrer PDF
 </button>
 
@@ -529,58 +543,7 @@ function stopDraw(){
     );
 
 }
-async function enregistrerPDF() {
 
-    const { jsPDF } = window.jspdf;
-
-    const element = document.getElementById("formulaire");
-
-    const canvasImage = await html2canvas(element, {
-        scale: 2,
-        useCORS: true
-    });
-
-    const imgData = canvasImage.toDataURL("image/png");
-
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pdfWidth = 210;
-    const pdfHeight = 297;
-
-    const imgWidth = pdfWidth;
-    const imgHeight = canvasImage.height * imgWidth / canvasImage.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    pdf.addImage(
-        imgData,
-        "PNG",
-        0,
-        position,
-        imgWidth,
-        imgHeight
-    );
-
-    heightLeft -= pdfHeight;
-
-    while (heightLeft > 0) {
-
-        position = heightLeft - imgHeight;
-
-        pdf.addPage();
-
-        pdf.addImage(
-            imgData,
-            "PNG",
-            0,
-            position,
-            imgWidth,
-            imgHeight
-        );
-
-        heightLeft -= pdfHeight;
-    }
 
     const nom = document.getElementById("nom").value || "Employe";
 const date = document.getElementById("date").value;
