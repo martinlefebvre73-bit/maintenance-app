@@ -1,111 +1,76 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>Rapport de fin de quart - Maintenance</title>
 
-/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-
 body{
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
+    font-family:Arial, sans-serif;
+    max-width:1000px;
     margin:auto;
     padding:20px;
-    background:white;
 }
 
 h1{
     text-align:center;
-    border:2px solid black;
-    padding:10px;
 }
 
 .section{
     margin-top:20px;
 }
 
-.section-title{
-    font-weight:bold;
-    font-size:18px;
-    margin-bottom:10px;
-    border-bottom:1px solid black;
-    padding-bottom:5px;
-}
-
-.row{
-    display:flex;
-    gap:20px;
-}
-
-.field{
-    flex:1;
-}
-
-input[type=date],
-input[type=text],
-select{
+table{
     width:100%;
-    padding:8px;
+    border-collapse:collapse;
     margin-top:5px;
-    box-sizing:border-box;
+}
+
+td,th{
+    border:1px solid black;
+    height:30px;
+    padding:5px;
 }
 
 textarea{
     width:100%;
-    min-height:120px;
-    padding:8px;
-    border:1px solid #ccc;
-    resize:vertical;
     box-sizing:border-box;
+    resize:vertical;
+    min-height:100px;
 }
 
-button{
-    padding:10px 15px;
-    margin-top:10px;
-    cursor:pointer;
+.field{
+    display:flex;
+    align-items:center;
+    gap:5px;
 }
 
 .voice{
-    background:#0078D7;
-    color:white;
-    border:none;
+    cursor:pointer;
+    font-size:20px;
 }
 
-.actions{
-    text-align:center;
-    margin-top:30px;
-}
-
-.actions button{
-    margin:5px;
-}
-
-canvas{
-    border:1px solid black;
+.signature-box{
+    border:2px solid black;
     width:100%;
-    height:150px;
+    height:200px;
     touch-action:none;
 }
 
-@media print{
-
-.actions,
-.voice{
-    display:none;
+.btns{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
 }
 
-body{
-    margin:0;
-    max-width:100%;
+button{
+    padding:10px 20px;
+    font-size:16px;
+    cursor:pointer;
 }
-
-}
-
 </style>
 </head>
 
@@ -113,26 +78,29 @@ body{
 
 <h1>RAPPORT DE FIN DE QUART – MAINTENANCE</h1>
 
-<div class="row">
+<table>
+<tr>
+<td width="50%">
+Date :
+<select id="date"></select>
+</td>
 
-    <div class="field">
-        <label><strong>Date :</strong></label>
-        <input type="date" id="date">
-    </div>
-
-    <div class="field">
-        <label><strong>Horaire :</strong></label>
-        <select id="horaire">
-            <option>Jour</option>
-            <option>Soir</option>
-            <option>Nuit</option>
-        </select>
-    </div>
-
-</div>
+<td width="50%">
+Horaire :
+<select id="horaire">
+<option>Jour</option>
+<option>Soir</option>
+<option>Nuit</option>
+<option>07h00 - 15h00</option>
+<option>15h00 - 23h00</option>
+<option>23h00 - 07h00</option>
+</select>
+</td>
+</tr>
+</table>
 
 <div class="section">
-<div class="section-title">Sujets traités</div>
+<b>Sujets traités</b><br><br>
 
 <label><input type="checkbox"> Appels de service complétés</label><br>
 <label><input type="checkbox"> Inspection générale</label><br>
@@ -142,34 +110,28 @@ body{
 <label><input type="checkbox"> Vérification systèmes électriques</label><br>
 <label><input type="checkbox"> Nettoyage / entretien installations</label><br>
 <label><input type="checkbox"> Autre</label>
-
 </div>
 
 <div class="section">
-<div class="section-title">Appels de service complétés</div>
+<b>Appels de service complétés</b>
 
-<textarea id="appels"></textarea>
-
-<button class="voice" onclick="voice('appels')">
-🎤 Dictée vocale
-</button>
-
+<div class="field">
+<textarea id="serviceCompletes"></textarea>
+<span class="voice" onclick="startDictation('serviceCompletes')">🎤</span>
+</div>
 </div>
 
 <div class="section">
-<div class="section-title">Appels de service / Interventions</div>
+<b>Appels de service / Interventions (inclure # logement + détail)</b>
 
+<div class="field">
 <textarea id="interventions"></textarea>
-
-<button class="voice" onclick="voice('interventions')">
-🎤 Dictée vocale
-</button>
-
+<span class="voice" onclick="startDictation('interventions')">🎤</span>
+</div>
 </div>
 
 <div class="section">
-
-<div class="section-title">Particularités / Piscine</div>
+<b>Particularités / Piscine</b><br><br>
 
 <label><input type="checkbox"> Conforme</label><br>
 <label><input type="checkbox"> Non conforme</label><br>
@@ -178,70 +140,224 @@ body{
 
 <br><br>
 
-<strong>Détails piscine</strong>
+<b>Détails piscine</b>
 
+<div class="field">
 <textarea id="piscine"></textarea>
-
-<button class="voice" onclick="voice('piscine')">
-🎤 Dictée vocale
-</button>
-
+<span class="voice" onclick="startDictation('piscine')">🎤</span>
+</div>
 </div>
 
 <div class="section">
+<b>Intervention d'urgence</b>
 
-<div class="section-title">Intervention d'urgence</div>
-
+<div class="field">
 <textarea id="urgence"></textarea>
-
-<button class="voice" onclick="voice('urgence')">
-🎤 Dictée vocale
-</button>
-
+<span class="voice" onclick="startDictation('urgence')">🎤</span>
+</div>
 </div>
 
 <div class="section">
+<b>Suivi travaux en cours</b>
 
-<div class="section-title">Suivi travaux en cours</div>
-
-<textarea id="suivi"></textarea>
-
-<button class="voice" onclick="voice('suivi')">
-🎤 Dictée vocale
-</button>
-
+<div class="field">
+<textarea id="travaux"></textarea>
+<span class="voice" onclick="startDictation('travaux')">🎤</span>
+</div>
 </div>
 
 <div class="section">
+<b>Autres observations</b>
 
-<div class="section-title">Autres observations</div>
-
+<div class="field">
 <textarea id="observations"></textarea>
-
-<button class="voice" onclick="voice('observations')">
-🎤 Dictée vocale
-</button>
-
+<span class="voice" onclick="startDictation('observations')">🎤</span>
+</div>
 </div>
 
 <div class="section">
+<b>Détails et Variants</b>
 
-<div class="section-title">Détails et Variants</div>
-
+<div class="field">
 <textarea id="details"></textarea>
-
-<button class="voice" onclick="voice('details')">
-🎤 Dictée vocale
-</button>
-
+<span class="voice" onclick="startDictation('details')">🎤</span>
+</div>
 </div>
 
-<div class="section">
+<br>
 
-<label><strong>Nom :</strong></label>
+<table>
+<tr>
+<td width="50%">
+Nom :
+<input type="text" id="nom" style="width:90%;">
+</td>
 
-<input type="text" id="nom">
+<td width="50%">
+Signature :
+</td>
+</tr>
 
-<button class="voice" onclick="voice('nom')">
-🎤 Dictée du nom
-</
+<tr>
+<td colspan="2">
+<canvas id="signature" class="signature-box"></canvas>
+</td>
+</tr>
+</table>
+
+<div class="btns">
+<button onclick="clearForm()">Effacer</button>
+<button onclick="saveExcel()">Sauvegarder</button>
+</div>
+
+<script>
+
+// Génération des dates
+const dateSelect = document.getElementById('date');
+
+for(let i=0;i<365;i++){
+    let d = new Date();
+    d.setDate(d.getDate()+i);
+
+    let opt = document.createElement('option');
+
+    opt.value=d.toISOString().split('T')[0];
+    opt.text=d.toLocaleDateString('fr-CA');
+
+    dateSelect.appendChild(opt);
+}
+
+// Dictée vocale
+function startDictation(id){
+
+if (!('webkitSpeechRecognition' in window)){
+    alert("Dictée vocale non supportée.");
+    return;
+}
+
+const recognition = new webkitSpeechRecognition();
+
+recognition.lang='fr-CA';
+recognition.continuous=false;
+recognition.interimResults=false;
+
+recognition.onresult=function(event){
+document.getElementById(id).value +=
+event.results[0][0].transcript + "\n";
+};
+
+recognition.start();
+}
+
+// Signature
+const canvas = document.getElementById('signature');
+const ctx = canvas.getContext('2d');
+
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+let drawing=false;
+
+function start(e){
+drawing=true;
+draw(e);
+}
+
+function end(){
+drawing=false;
+ctx.beginPath();
+}
+
+function draw(e){
+
+if(!drawing) return;
+
+e.preventDefault();
+
+let rect=canvas.getBoundingClientRect();
+
+let x,y;
+
+if(e.touches){
+x=e.touches[0].clientX-rect.left;
+y=e.touches[0].clientY-rect.top;
+}else{
+x=e.clientX-rect.left;
+y=e.clientY-rect.top;
+}
+
+ctx.lineWidth=2;
+ctx.lineCap='round';
+
+ctx.lineTo(x,y);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(x,y);
+}
+
+canvas.addEventListener("mousedown",start);
+canvas.addEventListener("mouseup",end);
+canvas.addEventListener("mousemove",draw);
+
+canvas.addEventListener("touchstart",start);
+canvas.addEventListener("touchend",end);
+canvas.addEventListener("touchmove",draw);
+
+// Effacer
+function clearForm(){
+
+document.querySelectorAll("textarea").forEach(a=>a.value="");
+document.querySelectorAll("input[type=text]").forEach(a=>a.value="");
+document.querySelectorAll("input[type=checkbox]").forEach(a=>a.checked=false);
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+// Sauvegarder Excel
+function saveExcel(){
+
+let data=[
+
+["Date",document.getElementById("date").value],
+["Horaire",document.getElementById("horaire").value],
+["Nom",document.getElementById("nom").value],
+
+["Appels complétés",
+document.getElementById("serviceCompletes").value],
+
+["Interventions",
+document.getElementById("interventions").value],
+
+["Piscine",
+document.getElementById("piscine").value],
+
+["Urgence",
+document.getElementById("urgence").value],
+
+["Travaux",
+document.getElementById("travaux").value],
+
+["Observations",
+document.getElementById("observations").value],
+
+["Détails",
+document.getElementById("details").value]
+];
+
+const wb = XLSX.utils.book_new();
+const ws = XLSX.utils.aoa_to_sheet(data);
+
+XLSX.utils.book_append_sheet(wb,ws,"Rapport");
+
+let nomFichier =
+"Rapport_Maintenance_" +
+document.getElementById("date").value +
+".xlsx";
+
+XLSX.writeFile(wb,nomFichier);
+}
+</script>
+
+</body>
+</html>
