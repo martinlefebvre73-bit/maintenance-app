@@ -501,11 +501,27 @@ canvas.addEventListener("mousemove", drawMove);
 canvas.addEventListener("mouseup", stopDraw);
 canvas.addEventListener("mouseout", stopDraw);
 
-canvas.addEventListener("touchstart", startDraw);
-canvas.addEventListener("touchmove", drawMove);
-canvas.addEventListener("touchend", stopDraw);
+canvas.addEventListener(
+    "touchstart",
+    startDraw,
+    { passive:false }
+);
+
+canvas.addEventListener(
+    "touchmove",
+    drawMove,
+    { passive:false }
+);
+
+canvas.addEventListener(
+    "touchend",
+    stopDraw,
+    { passive:false }
+);
 
 function startDraw(e){
+
+    e.preventDefault();
 
     draw = true;
 
@@ -545,11 +561,7 @@ function stopDraw(){
 }
 
 
-    const nom = document.getElementById("nom").value || "Employe";
-const date = document.getElementById("date").value;
 
-pdf.save(`Rapport_${nom}_${date}.pdf`);
-}
 </script>
 
 </body>
