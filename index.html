@@ -1,711 +1,462 @@
 <!DOCTYPE html>
 <html lang="fr">
-<br>
 <head>
-<br>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<br>
-<title>Rapport de fin de quart - Maintenance</title>
-<br>
-/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<br>
+
+<title>Rapport de Fin de Quart</title>
+
+/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js
+
 <style>
-<br>
+
 body{
-    font-family:Arial,sans-serif;
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:#eef4fb;
+    margin:15px;
+}
+
+#formulaire{
     max-width:1200px;
     margin:auto;
+}
+
+.entete{
+    background:#0078D4;
+    color:white;
     padding:20px;
-    background:#f5f5f5;
-}
-<br>
-h1{
+    border-radius:10px;
+    margin-bottom:15px;
     text-align:center;
-    color:#2F75B5;
-    margin-bottom:25px;
+    box-shadow:0 2px 8px rgba(0,0,0,.20);
 }
-<br>
-.top-table{
+
+.section{
+    background:white;
+    border:2px solid #0078D4;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,.10);
+}
+
+.section-title{
+    background:#0078D4;
+    color:white;
+    padding:12px;
+    font-size:18px;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.section-content{
+    padding:15px;
+}
+
+.row{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.col{
+    flex:1;
+    min-width:250px;
+}
+
+label{
+    display:block;
+    font-weight:600;
+    margin-top:10px;
+}
+
+input,
+select,
+textarea{
     width:100%;
-    margin-bottom:20px;
-}
-<br>
-.top-table td{
     padding:10px;
-}
-<br>
-input[type=text],
-input[type=date],
-select{
-    width:100%;
-    padding:10px;
+    margin-top:5px;
+    border:1px solid #b9c5d3;
+    border-radius:6px;
     font-size:16px;
     box-sizing:border-box;
 }
-<br>
-.section-box{
-    border:2px solid #2F75B5;
-    border-radius:6px;
-    margin-bottom:20px;
-    overflow:hidden;
-    background:white;
-}
-<br>
-.section-title{
-    background:#2F75B5;
-    color:white;
-    font-weight:bold;
-    text-transform:uppercase;
-    padding:12px;
-}
-<br>
-.section-content{
-    padding:12px;
-    background:#F8FBFF;
-}
-<br>
+
 textarea{
-    width:100%;
     min-height:120px;
-    resize:vertical;
-    padding:10px;
-    font-size:14px;
-    box-sizing:border-box;
 }
-<br>
-.voice-btn{
-    background:#2F75B5;
+
+.checkbox-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:10px;
+}
+
+.voice{
+    background:#00A4EF;
     color:white;
     border:none;
     padding:8px 12px;
-    border-radius:4px;
+    border-radius:5px;
+    margin-top:5px;
     cursor:pointer;
-    margin-top:10px;
 }
-<br>
-.voice-btn:hover{
-    background:#1f5d94;
-}
-<br>
-.checkbox-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:10px;
-}
-<br>
-.signature-container{
-    border:2px solid #2F75B5;
-    border-radius:6px;
-    overflow:hidden;
-    background:white;
-    margin-top:20px;
-}
-<br>
-.signature-title{
-    background:#2F75B5;
-    color:white;
-    font-weight:bold;
-    padding:12px;
-}
-<br>
+
 .signature-box{
     width:100%;
-    height:220px;
-    background:#fff;
-    display:block;
+    height:300px;
+    border:3px solid #0078D4;
+    border-radius:8px;
     touch-action:none;
-    cursor:crosshair;
+    background:white;
 }
-<br>
+
 .actions{
-    margin-top:25px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+    text-align:center;
+    margin-top:20px;
 }
-<br>
-.actions button{
+
+.btn{
     border:none;
-    color:white;
-    padding:12px 20px;
-    border-radius:5px;
-    cursor:pointer;
+    padding:12px 25px;
+    margin:5px;
+    border-radius:6px;
     font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
 }
-<br>
-.btn-save{
-    background:#28a745;
+
+.pdf{
+    background:#107C10;
+    color:white;
 }
-<br>
-.btn-clear{
-    background:#dc3545;
+
+.clear{
+    background:#D83B01;
+    color:white;
 }
-<br>
-.btn-sign{
-    background:#f39c12;
-}
-<br>
+
 </style>
-<br>
+
 </head>
-<br>
+
 <body>
-<br>
-<h1>RAPPORT DE FIN DE QUART - MAINTENANCE</h1>
-<br>
-<table class="top-table">
-<br>
-<tr>
-<br>
-<td>
-<br>
+
+<div id="formulaire">
+
+<div class="entete">
+<h1>RAPPORT DE FIN DE QUART</h1>
+</div>
+
+<div class="section">
+<div class="section-title">
+Informations générales
+</div>
+
+<div class="section-content">
+
+<div class="row">
+
+<div class="col">
 <label>Date</label>
 <input type="date" id="date">
-<br>
-</td>
-<br>
-<td>
-<br>
+</div>
+
+<div class="col">
 <label>Horaire</label>
-<br>
 <select id="horaire">
 <option>Jour</option>
 <option>Soir</option>
 <option>Nuit</option>
-<option>07h00 - 15h00</option>
-<option>15h00 - 23h00</option>
-<option>23h00 - 07h00</option>
 </select>
-<br>
-</td>
-<br>
-</tr>
-<br>
-<tr>
-<br>
-<td colspan="2">
-<br>
-<label>Nom</label>
-<br>
-<div style="display:flex;gap:10px;align-items:center;">
-<br>
-<input type="text" id="nom">
-<br>
-<button
-type="button"
-class="voice-btn"
-onclick="startDictation('nom')">
-🎤
-</button>
-<br>
 </div>
-<br>
-</td>
-<br>
-</tr>
-<br>
-</table>
-<br>
-<div class="section-box">
-<br>
+
+</div>
+
+<label>Nom</label>
+<input type="text" id="nom">
+
+<button class="voice"
+onclick="dictee('nom')">
+🎤 Dictée
+</button>
+
+</div>
+</div>
+
+<div class="section">
+
 <div class="section-title">
 Sujets traités
 </div>
-<br>
+
 <div class="section-content">
-<br>
+
 <div class="checkbox-grid">
-<br>
+
 <label><input type="checkbox"> Appels de service complétés</label>
+
 <label><input type="checkbox"> Inspection générale</label>
+
 <label><input type="checkbox"> Intervention d'urgence</label>
+
 <label><input type="checkbox"> Suivi travaux en cours</label>
+
 <label><input type="checkbox"> Vérification équipements mécaniques</label>
+
 <label><input type="checkbox"> Vérification systèmes électriques</label>
+
 <label><input type="checkbox"> Nettoyage / entretien installations</label>
+
 <label><input type="checkbox"> Autre</label>
-<br>
+
 </div>
-<br>
+
 </div>
-<br>
+
 </div>
-<br>
-<div id="sections"></div>
-<br>
-<div class="signature-container">
-<br>
-<div class="signature-title">
+
+<div class="section">
+<div class="section-title">
+Appels de service complétés
+</div>
+
+<div class="section-content">
+
+<textarea id="appels"></textarea>
+
+<button class="voice"
+onclick="dictee('appels')">
+🎤 Dictée
+</button>
+
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">
+Interventions
+</div>
+
+<div class="section-content">
+
+<textarea id="interventions"></textarea>
+
+<button class="voice"
+onclick="dictee('interventions')">
+🎤 Dictée
+</button>
+
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">
+Piscine
+</div>
+
+<div class="section-content">
+
+<div class="checkbox-grid">
+
+<label><input type="checkbox"> Conforme</label>
+
+<label><input type="checkbox"> Non Conforme</label>
+
+<label><input type="checkbox"> Nettoyage effectué</label>
+
+<label><input type="checkbox"> Produit chimique ajusté</label>
+
+</div>
+
+<label>Détails Piscine</label>
+
+<textarea id="piscine"></textarea>
+
+<button class="voice"
+onclick="dictee('piscine')">
+🎤 Dictée
+</button>
+
+</div>
+</div>
+
+<div class="section">
+
+<div class="section-title">
+Intervention d'urgence
+</div>
+
+<div class="section-content">
+
+<textarea id="urgence"></textarea>
+
+<button class="voice"
+onclick="dictee('urgence')">
+🎤 Dictée
+</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+Suivi des travaux
+</div>
+
+<div class="section-content">
+
+<textarea id="travaux"></textarea>
+
+<button class="voice"
+onclick="dictee('travaux')">
+🎤 Dictée
+</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+Autres observations
+</div>
+
+<div class="section-content">
+
+<textarea id="observations"></textarea>
+
+<button class="voice"
+onclick="dictee('observations')">
+🎤 Dictée
+</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+Détails et variants
+</div>
+
+<div class="section-content">
+
+<textarea id="details"></textarea>
+
+<button class="voice"
+onclick="dictee('details')">
+🎤 Dictée
+</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
 Signature
 </div>
-<br>
+
+<div class="section-content">
+
 <canvas
 id="signature"
 class="signature-box">
 </canvas>
-<br>
+
 </div>
-<br>
+
+</div>
+
 <div class="actions">
-<br>
+
 <button
-class="btn-sign"
-onclick="clearSignature()">
+class="btn clear"
+onclick="effacerSignature()">
 Effacer Signature
 </button>
-<br>
+
 <button
-class="btn-clear"
-onclick="clearForm()">
-Effacer Formulaire
+class="btn pdf"
+onclick="enregistrerPDF()">
+Enregistrer PDF
 </button>
-<br>
-<button
-class="btn-save"
-onclick="savePDF()">
-Sauvegarder PDF
-</button>
-<br>
+
 </div>
-<br>
+
+</div>
+
 <script>
-<br>
+
+/* DATE DU JOUR */
+
 document.getElementById("date").value =
-new Date().toISOString().substring(0,10);
-<br>
-const sections = [
-<br>
-["serviceCompletes","Appels de service complétés"],
-["interventions","Appels de service / Interventions"],
-["piscine","Particularités / Piscine"],
-["urgence","Intervention d'urgence"],
-["travaux","Suivi travaux en cours"],
-["observations","Autres observations"],
-["details","Détails et Variants"]
-<br>
-];
-<br>
-const container =
-document.getElementById("sections");
-<br>
-sections.forEach(section=>{
-<br>
-container.innerHTML += `
-<br>
-<div class="section-box">
-<br>
-<div class="section-title">
-${section[1]}
-</div>
-<br>
-<div class="section-content">
-<br>
-<textarea id="${section[0]}"></textarea>
-<br>
-<button
-type="button"
-class="voice-btn"
-onclick="startDictation('${section[0]}')">
-<br>
-🎤 Dictée vocale
-<br>
-</button>
-<br>
-</div>
-<br>
-</div>
-<br>
-`;
-<br>
-});
-<br>
-function startDictation(id){
-<br>
-if(!('webkitSpeechRecognition' in window)){
-alert("Dictée vocale non disponible");
+new Date().toISOString().split("T")[0];
+
+/* DICTÉE VOCALE */
+
+function dictee(id){
+
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+if(!SpeechRecognition){
+alert("Dictée vocale non supportée");
 return;
 }
-<br>
+
 const recognition =
-new webkitSpeechRecognition();
-<br>
-recognition.lang = "fr-CA";
-recognition.continuous = false;
-recognition.interimResults = false;
-<br>
-recognition.onresult = function(event){
-<br>
-const texte =
+new SpeechRecognition();
+
+recognition.lang='fr-CA';
+
+recognition.onresult=(event)=>{
+
+document.getElementById(id).value +=
+" " +
 event.results[0][0].transcript;
-<br>
-const champ =
-document.getElementById(id);
-<br>
-if(champ.tagName==="TEXTAREA"){
-champ.value += texte + "\n";
-}else{
-champ.value = texte;
-}
-<br>
+
 };
-<br>
+
 recognition.start();
-<br>
+
 }
-<br>
+
+/* SIGNATURE */
+
 const canvas =
 document.getElementById("signature");
-<br>
+
 const ctx =
 canvas.getContext("2d");
-<br>
+
 function resizeCanvas(){
-<br>
-const ratio =
-window.devicePixelRatio || 1;
-<br>
-canvas.width =
-canvas.offsetWidth * ratio;
-<br>
-canvas.height =
-canvas.offsetHeight * ratio;
-<br>
-ctx.setTransform(ratio,0,0,ratio,0,0);
-<br>
-ctx.lineWidth = 2;
-ctx.lineCap = "round";
-ctx.lineJoin = "round";
-ctx.strokeStyle = "#000";
-<br>
+
+const rect =
+canvas.getBoundingClientRect();
+
+canvas.width = rect.width;
+canvas.height = rect.height;
+
 }
-<br>
+
 resizeCanvas();
-<br>
+
 window.addEventListener(
 "resize",
 resizeCanvas
 );
-<br>
-let dessin = false;
-<br>
-function getPoint(event){
-<br>
+
+let draw=false;
+
+function getPos(e){
+
 const rect =
-canvas.getBoundingClientRect();
-<br>
-if(event.touches){
-<br>
-return {
-x:event.touches[0].clientX - rect.left,
-y:event.touches[0].clientY - rect.top
-};
-<br>
-}
-<br>
-return {
-x:event.clientX - rect.left,
-y:event.clientY - rect.top
-};
-<br>
-}
-<br>
-function debutSignature(event){
-<br>
-event.preventDefault();
-<br>
-dessin = true;
-<br>
-const point =
-getPoint(event);
-<br>
-ctx.beginPath();
-ctx.moveTo(point.x,point.y);
-<br>
-}
-<br>
-function signer(event){
-<br>
-if(!dessin) return;
-<br>
-event.preventDefault();
-<br>
-const point =
-getPoint(event);
-<br>
-ctx.lineTo(point.x,point.y);
-ctx.stroke();
-<br>
-}
-<br>
-function finSignature(event){
-<br>
-event.preventDefault();
-<br>
-dessin = false;
-<br>
-ctx.beginPath();
-<br>
-}
-<br>
-canvas.addEventListener("mousedown",debutSignature);
-canvas.addEventListener("mousemove",signer);
-canvas.addEventListener("mouseup",finSignature);
-canvas.addEventListener("mouseleave",finSignature);
-<br>
-canvas.addEventListener(
-"touchstart",
-debutSignature,
-{passive:false}
-);
-<br>
-canvas.addEventListener(
-"touchmove",
-signer,
-{passive:false}
-);
-<br>
-canvas.addEventListener(
-"touchend",
-finSignature,
-{passive:false}
-);
-<br>
-function clearSignature(){
-<br>
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-<br>
-}
-<br>
-function signatureExiste(){
-<br>
-const blank =
-document.createElement("canvas");
-<br>
-blank.width = canvas.width;
-blank.height = canvas.height;
-<br>
-return (
-canvas.toDataURL() !==
-blank.toDataURL()
-);
-<br>
-}
-<br>
-function clearForm(){
-<br>
-document
-.querySelectorAll("textarea")
-.forEach(el=>el.value="");
-<br>
-document
-.querySelectorAll("input[type=text]")
-.forEach(el=>el.value="");
-<br>
-document
-.querySelectorAll("input[type=checkbox]")
-.forEach(el=>el.checked=false);
-<br>
-document.getElementById("horaire").selectedIndex = 0;
-<br>
-document.getElementById("date").value =
-new Date().toISOString().substring(0,10);
-<br>
-clearSignature();
-<br>
-}
-<br>
-async function savePDF(){
-<br>
-if(!signatureExiste()){
-<br>
-alert(
-"Veuillez signer avant de sauvegarder."
-);
-<br>
-return;
-<br>
-}
-<br>
-const { jsPDF } = window.jspdf;
-<br>
-const pdf = new jsPDF(
-"p",
-"mm",
-"letter"
-);
-<br>
-let y = 15;
-<br>
-pdf.setFontSize(18);
-<br>
-pdf.text(
-"RAPPORT DE FIN DE QUART - MAINTENANCE",
-15,
-y
-);
-<br>
-y += 12;
-<br>
-pdf.setFontSize(11);
-<br>
-pdf.text(
-`Date : ${document.getElementById("date").value}`,
-15,
-y
-);
-<br>
-y += 7;
-<br>
-pdf.text(
-`Horaire : ${document.getElementById("horaire").value}`,
-15,
-y
-);
-<br>
-y += 7;
-<br>
-pdf.text(
-`Nom : ${document.getElementById("nom").value}`,
-15,
-y
-);
-<br>
-y += 10;
-<br>
-const sujets = [];
-<br>
-document
-.querySelectorAll('.checkbox-grid input[type="checkbox"]')
-.forEach(cb=>{
-<br>
-if(cb.checked){
-<br>
-sujets.push(
-cb.parentElement.textContent.trim()
-);
-<br>
-}
-<br>
-});
-<br>
-pdf.setFont(undefined,"bold");
-<br>
-pdf.text(
-"Sujets traités :",
-15,
-y
-);
-<br>
-pdf.setFont(undefined,"normal");
-<br>
-y += 6;
-<br>
-const lignesSujets =
-pdf.splitTextToSize(
-sujets.join(", ") || "Aucun",
-170
-);
-<br>
-pdf.text(
-lignesSujets,
-15,
-y
-);
-<br>
-y += lignesSujets.length * 5 + 8;
-<br>
-sections.forEach(section=>{
-<br>
-const texte =
-document.getElementById(
-section[0]
-).value || "-";
-<br>
-if(y > 220){
-<br>
-pdf.addPage();
-y = 15;
-<br>
-}
-<br>
-pdf.setFont(undefined,"bold");
-<br>
-pdf.text(
-section[1],
-15,
-y
-);
-<br>
-pdf.setFont(undefined,"normal");
-<br>
-y += 6;
-<br>
-const lignes =
-pdf.splitTextToSize(
-texte,
-170
-);
-<br>
-pdf.text(
-lignes,
-15,
-y
-);
-<br>
-y += lignes.length * 5 + 8;
-<br>
-});
-<br>
-if(y > 180){
-<br>
-pdf.addPage();
-y = 15;
-<br>
-}
-<br>
-pdf.setFont(undefined,"bold");
-<br>
-pdf.text(
-"Signature",
-15,
-y
-);
-<br>
-y += 8;
-<br>
-const signature =
-canvas.toDataURL("image/png");
-<br>
-pdf.addImage(
-signature,
-"PNG",
-15,
-y,
-70,
-35
-);
-<br>
-const nom =
-document.getElementById("nom").value || "Utilisateur";
-<br>
-const fichier =
-`Rapport_Maintenance_${document.getElementById("date").value}_${nom}.pdf`;
-<br>
-pdf.save(fichier);
-<br>
-alert(
-"PDF sauvegardé avec succès."
-);
-<br>
-}
-<br>
-</script>
-<br>
-</body>
-</html>
