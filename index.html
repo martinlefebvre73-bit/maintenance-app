@@ -6,8 +6,8 @@
 
 <title>Rapport de Fin de Quart</title>
 
-/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js
+<script src="httpsdflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 
@@ -459,4 +459,107 @@ let draw=false;
 
 function getPos(e){
 
-const rect =
+    const rect = canvas.getBoundingClientRect();
+
+    if(e.touches){
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    }
+
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
+
+canvas.addEventListener("mousedown", startDraw);
+canvas.addEventListener("mousemove", drawMove);
+canvas.addEventListener("mouseup", stopDraw);
+canvas.addEventListener("mouseout", stopDraw);
+
+canvas.addEventListener("touchstart", startDraw);
+canvas.addEventListener("touchmove", drawMove);
+canvas.addEventListener("touchend", stopDraw);
+
+function startDraw(e){
+
+    draw = true;
+
+    const pos = getPos(e);
+
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+}
+
+function drawMove(e){
+
+    if(!draw) return;
+
+    e.preventDefault();
+
+    const pos = getPos(e);
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+}
+
+function stopDraw(){
+    draw = false;
+}function effacerSignature(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+async function enregistrerPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const element =
+        document.getElementById("formulaire");
+
+    const canvasImage =
+        await html2canvas(element,{
+            scale:2
+        });
+
+    const imgData =
+        canvasImage.toDataURL("image/png");
+
+    const pdf =
+        new jsPDF("p","mm","a4");
+
+    const largeur =
+        210;
+
+    const hauteur =
+        canvasImage.height * largeur /
+        canvasImage.width;
+
+    pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        largeur,
+        hauteur
+    );
+
+    pdf.save(
+        "Rapport_Fin_Quart.pdf"
+    );
+}
+</script>
+
+</body>
+</html>    
