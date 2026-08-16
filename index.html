@@ -583,7 +583,10 @@ async function enregistrerPDF() {
         heightLeft -= pdfHeight;
     }
 
-    pdf.save("Rapport_Fin_Quart.pdf");
+    const nom = document.getElementById("nom").value || "Employe";
+const date = document.getElementById("date").value;
+
+pdf.save(`Rapport_${nom}_${date}.pdf`);
 }
 </script>
 
