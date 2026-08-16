@@ -1,91 +1,95 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Rapport de fin de quart - Maintenance</title>
 
-https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
 <style>
 
 body{
     font-family: Arial, sans-serif;
     max-width: 1000px;
-    margin: auto;
-    padding: 20px;
-    background: white;
+    margin:auto;
+    padding:20px;
+    background:white;
 }
 
 h1{
-    text-align: center;
-    border: 2px solid black;
-    padding: 10px;
+    text-align:center;
+    border:2px solid black;
+    padding:10px;
 }
 
 .section{
-    margin-top: 20px;
+    margin-top:20px;
 }
 
 .section-title{
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid black;
-    padding-bottom: 5px;
+    font-weight:bold;
+    font-size:18px;
+    margin-bottom:10px;
+    border-bottom:1px solid black;
+    padding-bottom:5px;
 }
 
 .row{
-    display: flex;
-    gap: 20px;
+    display:flex;
+    gap:20px;
 }
 
 .field{
-    flex: 1;
+    flex:1;
 }
 
 input[type=date],
 input[type=text],
 select{
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    box-sizing:border-box;
 }
 
 textarea{
-    width: 100%;
-    min-height: 120px;
-    border: 1px solid #ccc;
-    padding: 8px;
-    resize: vertical;
+    width:100%;
+    min-height:120px;
+    padding:8px;
+    border:1px solid #ccc;
+    resize:vertical;
+    box-sizing:border-box;
 }
 
 button{
-    padding: 10px 15px;
-    margin-top: 10px;
-    cursor: pointer;
+    padding:10px 15px;
+    margin-top:10px;
+    cursor:pointer;
 }
 
 .voice{
-    background: #0078D7;
-    color: white;
-    border: none;
+    background:#0078D7;
+    color:white;
+    border:none;
 }
 
 .actions{
-    text-align: center;
-    margin-top: 30px;
+    text-align:center;
+    margin-top:30px;
 }
 
 .actions button{
-    margin: 5px;
+    margin:5px;
 }
 
 canvas{
-    border: 1px solid black;
-    width: 100%;
-    height: 150px;
+    border:1px solid black;
+    width:100%;
+    height:150px;
+    touch-action:none;
 }
 
 @media print{
@@ -97,6 +101,7 @@ canvas{
 
 body{
     margin:0;
+    max-width:100%;
 }
 
 }
@@ -127,130 +132,116 @@ body{
 </div>
 
 <div class="section">
-    <div class="section-title">Sujets traités</div>
+<div class="section-title">Sujets traités</div>
 
-    <label><input type="checkbox"> Appels de service complétés</label><br>
-    <label><input type="checkbox"> Inspection générale</label><br>
-    <label><input type="checkbox"> Intervention d'urgence</label><br>
-    <label><input type="checkbox"> Suivi travaux en cours</label><br>
-    <label><input type="checkbox"> Vérification équipements mécaniques</label><br>
-    <label><input type="checkbox"> Vérification systèmes électriques</label><br>
-    <label><input type="checkbox"> Nettoyage / entretien installations</label><br>
-    <label><input type="checkbox"> Autre</label>
+<label><input type="checkbox"> Appels de service complétés</label><br>
+<label><input type="checkbox"> Inspection générale</label><br>
+<label><input type="checkbox"> Intervention d'urgence</label><br>
+<label><input type="checkbox"> Suivi travaux en cours</label><br>
+<label><input type="checkbox"> Vérification équipements mécaniques</label><br>
+<label><input type="checkbox"> Vérification systèmes électriques</label><br>
+<label><input type="checkbox"> Nettoyage / entretien installations</label><br>
+<label><input type="checkbox"> Autre</label>
 
 </div>
 
 <div class="section">
-    <div class="section-title">Appels de service complétés</div>
+<div class="section-title">Appels de service complétés</div>
 
-    <textarea id="appels"></textarea>
+<textarea id="appels"></textarea>
 
-    <button class="voice" onclick="voice('appels')">
-        🎤 Dictée vocale
-    </button>
+<button class="voice" onclick="voice('appels')">
+🎤 Dictée vocale
+</button>
+
 </div>
 
 <div class="section">
-    <div class="section-title">Appels de service / Interventions</div>
+<div class="section-title">Appels de service / Interventions</div>
 
-    <textarea id="interventions"></textarea>
+<textarea id="interventions"></textarea>
 
-    <button class="voice" onclick="voice('interventions')">
-        🎤 Dictée vocale
-    </button>
-</div>
-
-<div class="section">
-
-    <div class="section-title">Particularités / Piscine</div>
-
-    <label><input type="checkbox"> Conforme</label><br>
-    <label><input type="checkbox"> Non conforme</label><br>
-    <label><input type="checkbox"> Nettoyage effectué</label><br>
-    <label><input type="checkbox"> Produit chimique ajusté</label>
-
-    <br><br>
-
-    <strong>Détails piscine</strong>
-
-    <textarea id="piscine"></textarea>
-
-    <button class="voice" onclick="voice('piscine')">
-        🎤 Dictée vocale
-    </button>
+<button class="voice" onclick="voice('interventions')">
+🎤 Dictée vocale
+</button>
 
 </div>
 
 <div class="section">
 
-    <div class="section-title">Intervention d'urgence</div>
+<div class="section-title">Particularités / Piscine</div>
 
-    <textarea id="urgence"></textarea>
+<label><input type="checkbox"> Conforme</label><br>
+<label><input type="checkbox"> Non conforme</label><br>
+<label><input type="checkbox"> Nettoyage effectué</label><br>
+<label><input type="checkbox"> Produit chimique ajusté</label>
 
-    <button class="voice" onclick="voice('urgence')">
-        🎤 Dictée vocale
-    </button>
+<br><br>
 
-</div>
+<strong>Détails piscine</strong>
 
-<div class="section">
+<textarea id="piscine"></textarea>
 
-    <div class="section-title">Suivi travaux en cours</div>
-
-    <textarea id="suivi"></textarea>
-
-    <button class="voice" onclick="voice('suivi')">
-        🎤 Dictée vocale
-    </button>
+<button class="voice" onclick="voice('piscine')">
+🎤 Dictée vocale
+</button>
 
 </div>
 
 <div class="section">
 
-    <div class="section-title">Autres observations</div>
+<div class="section-title">Intervention d'urgence</div>
 
-    <textarea id="observations"></textarea>
+<textarea id="urgence"></textarea>
 
-    <button class="voice" onclick="voice('observations')">
-        🎤 Dictée vocale
-    </button>
-
-</div>
-
-<div class="section">
-
-    <div class="section-title">Détails et Variants</div>
-
-    <textarea id="details"></textarea>
-
-    <button class="voice" onclick="voice('details')">
-        🎤 Dictée vocale
-    </button>
+<button class="voice" onclick="voice('urgence')">
+🎤 Dictée vocale
+</button>
 
 </div>
 
 <div class="section">
 
-    <label><strong>Nom :</strong></label>
+<div class="section-title">Suivi travaux en cours</div>
 
-    <input type="text" id="nom">
+<textarea id="suivi"></textarea>
 
-    <button class="voice" onclick="voice('nom')">
-        🎤 Dictée du nom
-    </button>
+<button class="voice" onclick="voice('suivi')">
+🎤 Dictée vocale
+</button>
 
 </div>
 
 <div class="section">
 
-    <label><strong>Signature :</strong></label>
+<div class="section-title">Autres observations</div>
 
-    <canvas id="signature" width="900" height="150"></canvas>
+<textarea id="observations"></textarea>
+
+<button class="voice" onclick="voice('observations')">
+🎤 Dictée vocale
+</button>
 
 </div>
 
-<div class="actions">
+<div class="section">
 
-    <button onclick="effacer()">
-        Effacer
-    </
+<div class="section-title">Détails et Variants</div>
+
+<textarea id="details"></textarea>
+
+<button class="voice" onclick="voice('details')">
+🎤 Dictée vocale
+</button>
+
+</div>
+
+<div class="section">
+
+<label><strong>Nom :</strong></label>
+
+<input type="text" id="nom">
+
+<button class="voice" onclick="voice('nom')">
+🎤 Dictée du nom
+</
