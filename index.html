@@ -6,7 +6,7 @@
 
 <title>Rapport de Fin de Quart</title>
 
-<script src="httpsdflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+<script src="https://cdnjs.cloudflare
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -438,14 +438,23 @@ document.getElementById("signature");
 const ctx =
 canvas.getContext("2d");
 
-function resizeCanvas(){
+function resizeCanvas() {
 
-const rect =
-canvas.getBoundingClientRect();
+    const image = canvas.toDataURL();
 
-canvas.width = rect.width;
-canvas.height = rect.height;
+    const rect = canvas.getBoundingClientRect();
 
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const img = new Image();
+
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+    };
+
+    img.src = image;
+}
 }
 
 resizeCanvas();
@@ -521,43 +530,60 @@ function stopDraw(){
     );
 
 }
-async function enregistrerPDF(){
+async function enregistrerPDF() {
 
     const { jsPDF } = window.jspdf;
 
-    const element =
-        document.getElementById("formulaire");
+    const element = document.getElementById("formulaire");
 
-    const canvasImage =
-        await html2canvas(element,{
-            scale:2
-        });
+    const canvasImage = await html2canvas(element, {
+        scale: 2,
+        useCORS: true
+    });
 
-    const imgData =
-        canvasImage.toDataURL("image/png");
+    const imgData = canvasImage.toDataURL("image/png");
 
-    const pdf =
-        new jsPDF("p","mm","a4");
+    const pdf = new jsPDF("p", "mm", "a4");
 
-    const largeur =
-        210;
+    const pdfWidth = 210;
+    const pdfHeight = 297;
 
-    const hauteur =
-        canvasImage.height * largeur /
-        canvasImage.width;
+    const imgWidth = pdfWidth;
+    const imgHeight = canvasImage.height * imgWidth / canvasImage.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
 
     pdf.addImage(
         imgData,
         "PNG",
         0,
-        0,
-        largeur,
-        hauteur
+        position,
+        imgWidth,
+        imgHeight
     );
 
-    pdf.save(
-        "Rapport_Fin_Quart.pdf"
-    );
+    heightLeft -= pdfHeight;
+
+    while (heightLeft > 0) {
+
+        position = heightLeft - imgHeight;
+
+        pdf.addPage();
+
+        pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            position,
+            imgWidth,
+            imgHeight
+        );
+
+        heightLeft -= pdfHeight;
+    }
+
+    pdf.save("Rapport_Fin_Quart.pdf");
 }
 </script>
 
