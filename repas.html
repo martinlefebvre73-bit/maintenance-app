@@ -734,5 +734,54 @@
 
         renderGrid();
     </script>
+    <!-- À placer juste avant la fermeture de </body> -->
+
+<!-- Scripts SDK Firebase v9+ (Modules) -->
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+  // 1. Remplacez ce bloc avec VOS identifiants Firebase récupérés à l'Étape 3
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-PiQisweqwrUjglqjRpomn3xxovINxGI",
+    authDomain: "gestion-repas-ea641.firebaseapp.com",
+    projectId: "gestion-repas-ea641",
+    storageBucket: "gestion-repas-ea641.firebasestorage.app",
+    messagingSenderId: "1045625396890",
+    appId: "1:1045625396890:web:64bcb54c1c3620cb36c923",
+      measurementId: "G-B19CW33KYT"
+  };
+
+  // Initialisation de Firebase & Firestore
+  const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+  // Référence au document central dans la BDD
+  const docRef = doc(db, "planning_repas", "donnees_utilisateur");
+
+  // 2. Synchronisation en TEMPS RÉEL (Écoute des changements)
+  onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      window.meals = data.meals || [];
+      window.favorites = data.favorites || [];
+      window.renderGrid();
+    } else {
+      // Première initialisation si la BDD est vide
+      saveToCloud();
+    }
+  });
+
+  // 3. Fonction pour sauvegarder vers Firebase au lieu du localStorage
+  window.saveToStorage = async function() {
+    try {
+      await setDoc(docRef, {
+        meals: window.meals,
+        favorites: window.favorites
+      });
+    } catch (e) {
+      console.error("Erreur de sauvegarde Firebase : ", e);
+    }
+  };
+</script>
 </body>
 </html>
