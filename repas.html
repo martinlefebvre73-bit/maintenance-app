@@ -278,8 +278,7 @@
                 </div>
             </div>
 
-            <div class="py-4 overflow-y-auto flex-grow space-y-3" id="favoritesList">
-                </div>
+            <div class="py-4 overflow-y-auto flex-grow space-y-3" id="favoritesList"></div>
 
             <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
                 <span class="text-xs text-slate-500" id="favCount">0 recette(s) enregistrée(s)</span>
@@ -305,14 +304,9 @@
             { id: 102, type: 'Dîner', name: 'Saumon poêlé & riz basmati', url: '', calories: 610, protein: 38, carbs: 50, fat: 24, notes: 'Citron, aneth, brocolis à la vapeur' }
         ];
 
-        let meals = JSON.parse(localStorage.getItem('weekly_meals')) || defaultMeals;
-        let favorites = JSON.parse(localStorage.getItem('favorite_recipes')) || defaultFavorites;
+        window.meals = JSON.parse(localStorage.getItem('weekly_meals')) || defaultMeals;
+        window.favorites = JSON.parse(localStorage.getItem('favorite_recipes')) || defaultFavorites;
         let copiedMeal = null;
-
-        function saveToStorage() {
-            localStorage.setItem('weekly_meals', JSON.stringify(meals));
-            localStorage.setItem('favorite_recipes', JSON.stringify(favorites));
-        }
 
         function getMealClass(type) {
             switch(type) {
@@ -335,7 +329,7 @@
         }
 
         function copyMeal(id) {
-            const meal = meals.find(m => m.id === id);
+            const meal = window.meals.find(m => m.id === id);
             if (!meal) return;
             copiedMeal = { ...meal };
             delete copiedMeal.id;
@@ -346,9 +340,9 @@
 
         function pasteMeal(targetDay) {
             if (!copiedMeal) return;
-            const newId = meals.length > 0 ? Math.max(...meals.map(m => m.id)) + 1 : 1;
-            meals.push({ ...copiedMeal, id: newId, day: targetDay });
-            saveToStorage();
+            const newId = window.meals.length > 0 ? Math.max(...window.meals.map(m => m.id)) + 1 : 1;
+            window.meals.push({ ...copiedMeal, id: newId, day: targetDay });
+            window.saveToStorage();
             renderGrid();
         }
 
@@ -360,10 +354,11 @@
 
         function renderGrid() {
             const grid = document.getElementById('weeklyGrid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             days.forEach(day => {
-                const dayMeals = meals.filter(m => m.day === day);
+                const dayMeals = (window.meals || []).filter(m => m.day === day);
                 const totalCals = dayMeals.reduce((sum, m) => sum + (parseInt(m.calories) || 0), 0);
 
                 const col = document.createElement('div');
@@ -462,17 +457,17 @@
             const fat = document.getElementById('recFat').value;
             const notes = document.getElementById('recNotes').value;
 
-            const favId = favorites.length > 0 ? Math.max(...favorites.map(f => f.id)) + 1 : 100;
-            favorites.push({ id: favId, type, name, url, calories, protein, carbs, fat, notes });
+            const favId = window.favorites.length > 0 ? Math.max(...window.favorites.map(f => f.id)) + 1 : 100;
+            window.favorites.push({ id: favId, type, name, url, calories, protein, carbs, fat, notes });
 
-            saveToStorage();
+            window.saveToStorage();
             updateFavPresetsSelect();
             closeNewRecipeModal();
             openFavoritesModal();
         }
 
         function editMeal(id) {
-            const meal = meals.find(m => m.id === id);
+            const meal = window.meals.find(m => m.id === id);
             if (!meal) return;
             document.getElementById('mealId').value = meal.id;
             document.getElementById('mealDay').value = meal.day;
@@ -502,32 +497,33 @@
             const notes = document.getElementById('mealNotes').value;
             const saveFav = document.getElementById('saveAsFavoriteCheck').checked;
 
-            const mealData = { id: id ? parseInt(id) : (meals.length > 0 ? Math.max(...meals.map(m => m.id)) + 1 : 1), day, type, name, url, calories, protein, carbs, fat, notes };
+            const mealData = { id: id ? parseInt(id) : (window.meals.length > 0 ? Math.max(...window.meals.map(m => m.id)) + 1 : 1), day, type, name, url, calories, protein, carbs, fat, notes };
 
             if (id) {
-                const idx = meals.findIndex(m => m.id === parseInt(id));
-                if (idx !== -1) meals[idx] = mealData;
+                const idx = window.meals.findIndex(m => m.id === parseInt(id));
+                if (idx !== -1) window.meals[idx] = mealData;
             } else {
-                meals.push(mealData);
+                window.meals.push(mealData);
             }
 
             if (saveFav) {
-                const favId = favorites.length > 0 ? Math.max(...favorites.map(f => f.id)) + 1 : 100;
-                favorites.push({ id: favId, type, name, url, calories, protein, carbs, fat, notes });
+                const favId = window.favorites.length > 0 ? Math.max(...window.favorites.map(f => f.id)) + 1 : 100;
+                window.favorites.push({ id: favId, type, name, url, calories, protein, carbs, fat, notes });
             }
 
-            saveToStorage(); renderGrid(); closeModal();
+            window.saveToStorage(); renderGrid(); closeModal();
         }
 
         function deleteMeal(id) {
-            meals = meals.filter(m => m.id !== id);
-            saveToStorage(); renderGrid();
+            window.meals = window.meals.filter(m => m.id !== id);
+            window.saveToStorage(); renderGrid();
         }
 
         function updateFavPresetsSelect() {
             const select = document.getElementById('favPresetSelect');
+            if (!select) return;
             select.innerHTML = '<option value="">-- Choisir parmi vos recettes --</option>';
-            favorites.forEach(f => {
+            (window.favorites || []).forEach(f => {
                 const opt = document.createElement('option');
                 opt.value = f.id;
                 opt.textContent = `[${f.type}] ${f.name} ${f.calories ? `(${f.calories} kcal)` : ''}`;
@@ -537,7 +533,7 @@
 
         function loadPresetMeal(favId) {
             if (!favId) return;
-            const fav = favorites.find(f => f.id === parseInt(favId));
+            const fav = window.favorites.find(f => f.id === parseInt(favId));
             if (!fav) return;
 
             document.getElementById('mealType').value = fav.type;
@@ -561,16 +557,17 @@
 
         function renderFavoritesList() {
             const container = document.getElementById('favoritesList');
+            if (!container) return;
             container.innerHTML = '';
 
-            document.getElementById('favCount').innerText = `${favorites.length} recette(s) enregistrée(s)`;
+            document.getElementById('favCount').innerText = `${(window.favorites || []).length} recette(s) enregistrée(s)`;
 
-            if (favorites.length === 0) {
+            if (!window.favorites || window.favorites.length === 0) {
                 container.innerHTML = `<p class="text-center text-slate-400 text-sm py-8 italic">Aucune recette favorite pour le moment.</p>`;
                 return;
             }
 
-            favorites.forEach(fav => {
+            window.favorites.forEach(fav => {
                 const item = document.createElement('div');
                 item.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3';
                 item.innerHTML = `
@@ -602,15 +599,15 @@
         }
 
         function addFavToCurrentWeek(favId) {
-            const fav = favorites.find(f => f.id === favId);
+            const fav = window.favorites.find(f => f.id === favId);
             if (!fav) return;
 
             const targetDay = prompt("À quel jour souhaitez-vous ajouter ce repas ? (Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche)", "Lundi");
             const validDay = days.find(d => d.toLowerCase() === (targetDay || '').trim().toLowerCase());
 
             if (validDay) {
-                const newId = meals.length > 0 ? Math.max(...meals.map(m => m.id)) + 1 : 1;
-                meals.push({
+                const newId = window.meals.length > 0 ? Math.max(...window.meals.map(m => m.id)) + 1 : 1;
+                window.meals.push({
                     id: newId,
                     day: validDay,
                     type: fav.type,
@@ -622,7 +619,7 @@
                     fat: fav.fat,
                     notes: fav.notes
                 });
-                saveToStorage();
+                window.saveToStorage();
                 renderGrid();
                 closeFavoritesModal();
             } else if (targetDay !== null) {
@@ -631,15 +628,15 @@
         }
 
         function deleteFavorite(favId) {
-            favorites = favorites.filter(f => f.id !== favId);
-            saveToStorage();
+            window.favorites = window.favorites.filter(f => f.id !== favId);
+            window.saveToStorage();
             renderFavoritesList();
             updateFavPresetsSelect();
         }
 
         function resetMenu() {
             if (confirm("Réinitialiser le menu par défaut ?")) {
-                meals = [...defaultMeals]; saveToStorage(); renderGrid();
+                window.meals = [...defaultMeals]; window.saveToStorage(); renderGrid();
             }
         }
 
@@ -703,11 +700,11 @@
 
             if (text.includes('retirer') || text.includes('supprimer') || text.includes('effacer')) {
                 if (!targetDay) return showFeedback("Précisez le jour à supprimer.");
-                meals = meals.filter(m => {
+                window.meals = window.meals.filter(m => {
                     if (targetType) return !(m.day.toLowerCase() === targetDay.toLowerCase() && m.type === targetType);
                     return m.day.toLowerCase() !== targetDay.toLowerCase();
                 });
-                saveToStorage(); renderGrid();
+                window.saveToStorage(); renderGrid();
                 return showFeedback(`Repas supprimé(s) pour ${targetDay}.`);
             }
 
@@ -724,87 +721,65 @@
 
                 if (!mealName) mealName = 'Repas ajouté à la voix';
 
-                const newId = meals.length > 0 ? Math.max(...meals.map(m => m.id)) + 1 : 1;
-                meals.push({ id: newId, day: targetDay, type: typeToUse, name: mealName.charAt(0).toUpperCase() + mealName.slice(1), url: '', calories: voiceCalories, protein: '', carbs: '', fat: '', notes: '' });
+                const newId = window.meals.length > 0 ? Math.max(...window.meals.map(m => m.id)) + 1 : 1;
+                window.meals.push({ id: newId, day: targetDay, type: typeToUse, name: mealName.charAt(0).toUpperCase() + mealName.slice(1), url: '', calories: voiceCalories, protein: '', carbs: '', fat: '', notes: '' });
                 
-                saveToStorage(); renderGrid();
+                window.saveToStorage(); renderGrid();
                 showFeedback(`Ajouté : ${mealName} (${targetDay})${voiceCalories ? ` - ${voiceCalories} kcal` : ''}`);
             }
         }
 
         renderGrid();
     </script>
-    <!-- À placer juste avant la fermeture de </body> -->
 
-<!-- Scripts SDK Firebase v9+ (Modules) -->
-<script type="module">
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  // 1. Remplacez ce bloc avec VOS identifiants Firebase récupérés à l'Étape 3
-  const firebaseConfig = {
-    apiKey: "AIzaSyD-PiQisweqwrUjglqjRpomn3xxovINxGI",
-    authDomain: "gestion-repas-ea641.firebaseapp.com",
-    projectId: "gestion-repas-ea641",
-    storageBucket: "gestion-repas-ea641.firebasestorage.app",
-    messagingSenderId: "1045625396890",
-    appId: "1:1045625396890:web:64bcb54c1c3620cb36c923",
-      measurementId: "G-B19CW33KYT"
-  };
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-PiQisweqwrUjglqjRpomn3xxovINxGI",
+            authDomain: "gestion-repas-ea641.firebaseapp.com",
+            projectId: "gestion-repas-ea641",
+            storageBucket: "gestion-repas-ea641.firebasestorage.app",
+            messagingSenderId: "1045625396890",
+            appId: "1:1045625396890:web:64bcb54c1c3620cb36c923",
+            measurementId: "G-B19CW33KYT"
+        };
 
- // Initialisation
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const docRef = doc(db, "planning_repas", "donnees_utilisateur");
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const docRef = doc(db, "planning_repas", "donnees_utilisateur");
 
-  // 2. Écoute en TEMPS RÉEL (Charge et met à jour automatiquement)
-  onSnapshot(docRef, (docSnap) => {
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      window.meals = data.meals || [];
-      window.favorites = data.favorites || [];
-    } else {
-      // Données par défaut si la BDD est vide
-      window.meals = defaultMeals;
-      window.favorites = defaultFavorites;
-      window.saveToStorage();
-    }
-    window.renderGrid();
-  }, (error) => {
-    console.error("Erreur de lecture Firebase :", error);
-  });
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                window.meals = data.meals || [];
+                window.favorites = data.favorites || [];
+            } else {
+                window.meals = defaultMeals;
+                window.favorites = defaultFavorites;
+                window.saveToStorage();
+            }
+            window.renderGrid();
+        }, (error) => {
+            console.error("Erreur de lecture Firebase :", error);
+        });
 
-  // 3. Fonction de sauvegarde distante
-  window.saveToStorage = async function() {
-    // Sauvegarde locale de secours
-    localStorage.setItem('weekly_meals', JSON.stringify(window.meals));
-    localStorage.setItem('favorite_recipes', JSON.stringify(window.favorites));
+        window.saveToStorage = async function() {
+            localStorage.setItem('weekly_meals', JSON.stringify(window.meals));
+            localStorage.setItem('favorite_recipes', JSON.stringify(window.favorites));
 
-    // Envoi vers Firebase
-    try {
-      await setDoc(docRef, {
-        meals: window.meals,
-        favorites: window.favorites
-      });
-      console.log("Sauvegarde Firebase réussie !");
-    } catch (e) {
-      console.error("Erreur d'écriture Firebase :", e);
-    }
-  };
-</script>
-  });
-
-  // 3. Fonction pour sauvegarder vers Firebase au lieu du localStorage
-  window.saveToStorage = async function() {
-    try {
-      await setDoc(docRef, {
-        meals: window.meals,
-        favorites: window.favorites
-      });
-    } catch (e) {
-      console.error("Erreur de sauvegarde Firebase : ", e);
-    }
-  };
-</script>
+            try {
+                await setDoc(docRef, {
+                    meals: window.meals,
+                    favorites: window.favorites
+                });
+                console.log("Sauvegarde Firebase réussie !");
+            } catch (e) {
+                console.error("Erreur de sauvegarde Firebase : ", e);
+            }
+        };
+    </script>
 </body>
 </html>
