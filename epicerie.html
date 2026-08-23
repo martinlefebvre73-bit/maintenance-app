@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste d'Épicerie Intelligente & Vocale Pro</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #e8f5e9;
+            --accent-color: #d32f2f;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .voice-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .mic-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.06);
+            background-color: #256528;
+        }
+
+        .mic-btn.listening {
+            background-color: var(--accent-color);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            70% { box-shadow: 0 0 0 18px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #455a64;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        .add-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .add-form {
+                grid-template-columns: 1fr 1fr;
+            }
+            .add-form input[type="text"] {
+                grid-column: span 2;
+            }
+            .add-form button {
+                grid-column: span 2;
+            }
+        }
+
+        .add-form input, .add-form select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .add-form input:focus, .add-form select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .add-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #256528;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            height: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .category-group {
+            margin-bottom: 20px;
+            background: #fafafa;
+            border: 1px solid #border-color;
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--primary-light);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #eef2f5;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+
+        .item.checked {
+            background-color: #f8f9fa;
+            opacity: 0.6;
+        }
+
+        .item.checked .item-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .item-text {
+            margin-left: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .item-qty {
+            font-size: 0.85rem;
+            background: #eef2f5;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .item-price {
+            font-size: 0.9rem;
+            color: #2e7d32;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+
+        .delete-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .total-card {
+            background: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            padding: 14px 18px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #555;
+            border: 1px solid #ccc;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #eee;
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background-color: #ffebee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛒 Épicerie Pro Vocale</h1>
+
+    <div class="voice-section">
+        <button id="micBtn" class="mic-btn" title="Appuyer pour dicter">🎤</button>
+        <div id="status" class="status">Appuyez sur le micro pour dicter vos achats</div>
+    </div>
+
+    <div class="add-form">
+        <input type="text" id="itemName" placeholder="Article (ex: Lait, Pommes)">
+        <input type="text" id="itemQty" placeholder="Qté / Format">
+        <input type="number" id="itemPrice" step="0.01" placeholder="Prix ($)">
+        <button id="addBtn" class="add-btn">Ajouter</button>
+    </div>
+
+    <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <div id="progressText" class="progress-text">0 / 0 article complété</div>
+
+    <div id="listContainer"></div>
+
+    <div id="totalCard" class="total-card">
+        <span>Total Estimé :</span>
+        <span id="totalAmount">0.00 $</span>
+    </div>
+
+    <div class="action-buttons">
+        <button id="clearCheckedBtn" class="btn-secondary">Décocher tout</button>
+        <button id="clearAllBtn" class="btn-danger">Tout effacer</button>
+    </div>
+</div>
+
+<script>
+    const categoriesKeywords = {
+        "🍎 Fruits & Légumes": ["pomme", "banane", "orange", "citron", "tomate", "laitue", "salade", "carotte", "oignon", "ail", "poivron", "concombre", "patate", "pomme de terre", "champignon", "avocat", "brocoli", "céleri", "fraise", "framboise", "bleuet", "poire", "raisin", "herbe", "persil", "cilantro"],
+        "🥩 Viandes & Poissons": ["poulet", "bœuf", "porc", "haché", "bacon", "saucisse", "jambon", "steak", "saumon", "truite", "sole", "crevette", "poisson", "dinde", "veau", "foie", "moule"],
+        "🧀 Produits Laitiers & Œufs": ["lait", "beurre", "fromage", "œuf", "oeuf", "oeufs", "œufs", "crème", "yogourt", "yaourt", "margarine", "mozzarella", "cheddar", "parmesan"],
+        "🍞 Boulangerie": ["pain", "baguette", "croissant", "tortilla", "pita", "muffin", "brioche", "bagel"],
+        "📦 Épicerie & Conserves": ["riz", "pâte", "pâtes", "spaghetti", "macaroni", "penne", "sauce", "soupe", "boîte", "huile", "vinaigre", "sucre", "farine", "sel", "poivre", "épice", "café", "thé", "jus", "eau", "biscuit", "chocolat", "chips", "canette"],
+        "❄️ Surgelés": ["glace", "surgelé", "frites", "pizza"],
+        "🧹 Entretien & Maison": ["savon", "papier", "essuie-tout", "sac", "détergent", "nettoyant"]
+    };
+
+    let items = JSON.parse(localStorage.getItem('grocery_items_v2')) || [];
+
+    const micBtn = document.getElementById('micBtn');
+    const statusDiv = document.getElementById('status');
+    const itemNameInput = document.getElementById('itemName');
+    const itemQtyInput = document.getElementById('itemQty');
+    const itemPriceInput = document.getElementById('itemPrice');
+    const addBtn = document.getElementById('addBtn');
+    const listContainer = document.getElementById('listContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const totalAmount = document.getElementById('totalAmount');
+    const clearCheckedBtn = document.getElementById('clearCheckedBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'fr-CA';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            micBtn.classList.add('listening');
+            statusDiv.textContent = "Écoute en cours... Parlez maintenant (ex: 2 sacs de lait, pommes)";
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            statusDiv.textContent = `Ajouté : "${transcript}"`;
+            processVoiceInput(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            statusDiv.textContent = "Erreur de reconnaissance : " + event.error;
+            stopListening();
+        };
+
+        recognition.onend = () => {
+            stopListening();
+        };
+    } else {
+        statusDiv.textContent = "La dictée vocale n'est pas supportée sur ce navigateur.";
+        micBtn.disabled = true;
+        micBtn.style.opacity = 0.5;
+    }
+
+    function stopListening() {
+        micBtn.classList.remove('listening');
+        setTimeout(() => {
+            if (!micBtn.classList.contains('listening')) {
+                statusDiv.textContent = "Appuyez sur le micro pour dicter vos achats";
+            }
+        }, 3000);
+    }
+
+    micBtn.addEventListener('click', () => {
+        if (!recognition) return;
+        if (micBtn.classList.contains('listening')) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    });
+
+    addBtn.addEventListener('click', () => {
+        const name = itemNameInput.value.trim();
+        const qty = itemQtyInput.value.trim();
+        const price = parseFloat(itemPriceInput.value) || 0;
+
+        if (name) {
+            addItem(name, qty, price);
+            itemNameInput.value = '';
+            itemQtyInput.value = '';
+            itemPriceInput.value = '';
+        }
+    });
+
+    function processVoiceInput(text) {
+        const rawItems = text.split(/\s+et\s+|,/i);
+        rawItems.forEach(raw => {
+            let trimmed = raw.trim();
+            if (trimmed) {
+                let qty = "";
+                // Extraire les quantités simples si mentionnées (ex: "2 litres de lait")
+                const qtyMatch = trimmed.match(/^(\d+|un|une|deux|trois)\s+(.+)/i);
+                if (qtyMatch) {
+                    qty = qtyMatch[1];
+                    trimmed = qtyMatch[2];
+                }
+
+                const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+                addItem(formatted, qty, 0);
+            }
+        });
+    }
+
+    function detectCategory(itemName) {
+        const lowerName = itemName.toLowerCase();
+        for (const [category, keywords] of Object.entries(categoriesKeywords)) {
+            if (keywords.some(kw => lowerName.includes(kw))) {
+                return category;
+            }
+        }
+        return "🛒 Divers";
+    }
+
+    function addItem(name, qty = "", price = 0) {
+        const category = detectCategory(name);
+        items.push({
+            id: Date.now() + Math.random(),
+            name: name,
+            qty: qty,
+            price: price,
+            category: category,
+            checked: false
+        });
+        saveAndRender();
+    }
+
+    function toggleCheck(id) {
+        items = items.map(item => item.id === id ? { ...item, checked: !item.checked } : item);
+        saveAndRender();
+    }
+
+    function deleteItem(id) {
+        items = items.filter(item => item.id !== id);
+        saveAndRender();
+    }
+
+    clearCheckedBtn.addEventListener('click', () => {
+        items = items.map(item => ({ ...item, checked: false }));
+        saveAndRender();
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        if (confirm("Voulez-vous vraiment vider toute la liste ?")) {
+            items = [];
+            saveAndRender();
+        }
+    });
+
+    function saveAndRender() {
+        localStorage.setItem('grocery_items_v2', JSON.stringify(items));
+        renderList();
+    }
+
+    function renderList() {
+        listContainer.innerHTML = '';
+
+        if (items.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; color: #888; padding: 20px 0;">Votre liste est vide.</p>';
+            progressBar.style.width = '0%';
+            progressText.textContent = "0 / 0 article complété";
+            totalAmount.textContent = "0.00 $";
+            return;
+        }
+
+        // Statistiques et progression
+        const totalItems = items.length;
+        const checkedItems = items.filter(i => i.checked).length;
+        const pct = Math.round((checkedItems / totalItems) * 100);
+        progressBar.style.width = pct + '%';
+        progressText.textContent = `${checkedItems} / ${totalItems} article(s) complété(s) (${pct}%)`;
+
+        // Total prix
+        const grandTotal = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+        totalAmount.textContent = grandTotal.toFixed(2) + " $";
+
+        // Regroupement par catégorie
+        const grouped = {};
+        items.forEach(item => {
+            if (!grouped[item.category]) grouped[item.category] = [];
+            grouped[item.category].push(item);
+        });
+
+        for (const [category, categoryItems] of Object.entries(grouped)) {
+            const catGroup = document.createElement('div');
+            catGroup.className = 'category-group';
+
+            const catTitle = document.createElement('div');
+            catTitle.className = 'category-title';
+            catTitle.textContent = category;
+            catGroup.appendChild(catTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'item-list';
+
+            categoryItems.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `item ${item.checked ? 'checked' : ''}`;
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'item-info';
+                infoDiv.addEventListener('click', () => toggleCheck(item.id));
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.checked;
+
+                const spanName = document.createElement('span');
+                spanName.className = 'item-text';
+                spanName.textContent = item.name;
+
+                infoDiv.appendChild(checkbox);
+                infoDiv.appendChild(spanName);
+
+                if (item.qty) {
+                    const spanQty = document.createElement('span');
+                    spanQty.className = 'item-qty';
+                    spanQty.textContent = item.qty;
+                    infoDiv.appendChild(spanQty);
+                }
+
+                li.appendChild(infoDiv);
+
+                if (item.price > 0) {
+                    const spanPrice = document.createElement('span');
+                    spanPrice.className = 'item-price';
+                    spanPrice.textContent = item.price.toFixed(2) + " $";
+                    li.appendChild(spanPrice);
+                }
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.innerHTML = '&times;';
+                delBtn.title = "Supprimer";
+                delBtn.addEventListener('click', () => deleteItem(item.id));
+
+                li.appendChild(delBtn);
+                ul.appendChild(li);
+            });
+
+            catGroup.appendChild(ul);
+            listContainer.appendChild(catGroup);
+        }
+    }
+
+    renderList();
+</script>
+
+</body>
+</html>
