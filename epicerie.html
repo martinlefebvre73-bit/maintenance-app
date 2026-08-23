@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Liste d'Épicerie Vocale</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #e8f5e9;
+            --accent-color: #d32f2f;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .voice-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--primary-light);
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .mic-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .mic-btn.listening {
+            background-color: var(--accent-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #555;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        .manual-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .manual-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .manual-input button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .category-group {
+            margin-bottom: 18px;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+            border: 1px solid #eee;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+
+        .item.checked span {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .item-text {
+            cursor: pointer;
+            flex: 1;
+            margin-left: 10px;
+            font-size: 1rem;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 6px;
+        }
+
+        .delete-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .clear-container {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .clear-btn {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background-color: #fbe9e7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛒 Liste d'Épicerie</h1>
+
+    <div class="voice-section">
+        <button id="micBtn" class="mic-btn" title="Appuyer pour dicter">🎤</button>
+        <div id="status" class="status">Appuyez sur le micro pour dicter</div>
+    </div>
+
+    <div class="manual-input">
+        <input type="text" id="manualItem" placeholder="Ajouter manuellement (ex: Pommes)">
+        <button id="addManualBtn">Ajouter</button>
+    </div>
+
+    <div id="listContainer">
+        <!-- Les catégories et articles seront injectés ici -->
+    </div>
+
+    <div class="clear-container">
+        <button id="clearAllBtn" class="clear-btn">Vider la liste</button>
+    </div>
+</div>
+
+<script>
+    // Dictionnaire pour catégoriser automatiquement les ingrédients
+    const categoriesKeywords = {
+        "Fruits & Légumes": ["pomme", "banane", "orange", "citron", "tomate", "laitue", "salade", "carotte", "oignon", "ail", "poivron", "concombre", "patate", "pomme de terre", "champignon", "avocat", "brocoli", "céleri", "fraise", "framboise", "bleuet", "poire", "raisin"],
+        "Viandes & Poissons": ["poulet", "bœuf", "porc", "haché", "bacon", "saucisse", "jambon", "steak", "saumon", "truite", "sole", "crevette", "poisson", "dinde", "veau", "foie"],
+        "Produits Laitiers & Œufs": ["lait", "beurre", "fromage", "œuf", "oeuf", "oeufs", "œufs", "crème", "yogourt", "yaourt", "margarine", "mozzarella", "cheddar"],
+        "Boulangerie & Pains": ["pain", "baguette", "croissant", "tortilla", "pita", "muffin", "brioche"],
+        "Épicerie & Conserves": ["riz", "pâte", "pâtes", "spaghetti", "macaroni", "penne", "sauce", "soupe", "boîte", "huile", "vinaigre", "sucre", "farine", "sel", "poivre", "épice", "café", "thé", "jus", "eau", "biscuit", "chocolat", "chips"],
+        "Surgelés": ["glace", "surgelé", "frites", "pizza"]
+    };
+
+    let items = JSON.parse(localStorage.getItem('grocery_items')) || [];
+
+    const micBtn = document.getElementById('micBtn');
+    const statusDiv = document.getElementById('status');
+    const manualInput = document.getElementById('manualItem');
+    const addManualBtn = document.getElementById('addManualBtn');
+    const listContainer = document.getElementById('listContainer');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    // Vérification de la compatibilité de la reconnaissance vocale
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'fr-CA'; // Français canadien
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            micBtn.classList.add('listening');
+            statusDiv.textContent = "Écoute en cours... Parlez maintenant";
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            statusDiv.textContent = `Ajouté : "${transcript}"`;
+            processVoiceInput(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            statusDiv.textContent = "Erreur de reconnaissance : " + event.error;
+            stopListening();
+        };
+
+        recognition.onend = () => {
+            stopListening();
+        };
+    } else {
+        statusDiv.textContent = "La dictée vocale n'est pas supportée sur ce navigateur.";
+        micBtn.disabled = true;
+        micBtn.style.opacity = 0.5;
+    }
+
+    function stopListening() {
+        micBtn.classList.remove('listening');
+        setTimeout(() => {
+            if (!micBtn.classList.contains('listening')) {
+                statusDiv.textContent = "Appuyez sur le micro pour dicter";
+            }
+        }, 3000);
+    }
+
+    micBtn.addEventListener('click', () => {
+        if (!recognition) return;
+        if (micBtn.classList.contains('listening')) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    });
+
+    addManualBtn.addEventListener('click', () => {
+        const value = manualInput.value.trim();
+        if (value) {
+            addItem(value);
+            manualInput.value = '';
+        }
+    });
+
+    manualInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addManualBtn.click();
+        }
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        if (confirm("Voulez-vous vraiment vider toute la liste ?")) {
+            items = [];
+            saveAndRender();
+        }
+    });
+
+    function processVoiceInput(text) {
+        // Séparer les mots si l'utilisateur dit "et" ou des virgules (ex: "Poulet et lait et pain")
+        const rawItems = text.split(/\s+et\s+|,/i);
+        rawItems.forEach(raw => {
+            const trimmed = raw.trim();
+            if (trimmed) {
+                // Capitaliser la première lettre
+                const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+                addItem(formatted);
+            }
+        });
+    }
+
+    function detectCategory(itemName) {
+        const lowerName = itemName.toLowerCase();
+        for (const [category, keywords] of Object.entries(categoriesKeywords)) {
+            if (keywords.some(kw => lowerName.includes(kw))) {
+                return category;
+            }
+        }
+        return "Divers";
+    }
+
+    function addItem(name) {
+        const category = detectCategory(name);
+        items.push({
+            id: Date.now() + Math.random(),
+            name: name,
+            category: category,
+            checked: false
+        });
+        saveAndRender();
+    }
+
+    function toggleCheck(id) {
+        items = items.map(item => item.id === id ? { ...item, checked: !item.checked } : item);
+        saveAndRender();
+    }
+
+    function deleteItem(id) {
+        items = items.filter(item => item.id !== id);
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('grocery_items', JSON.stringify(items));
+        renderList();
+    }
+
+    function renderList() {
+        listContainer.innerHTML = '';
+
+        if (items.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; color: #888;">Votre liste est vide.</p>';
+            return;
+        }
+
+        // Regrouper les articles par catégorie
+        const grouped = {};
+        items.forEach(item => {
+            if (!grouped[item.category]) grouped[item.category] = [];
+            grouped[item.category].push(item);
+        });
+
+        for (const [category, categoryItems] of Object.entries(grouped)) {
+            const catGroup = document.createElement('div');
+            catGroup.className = 'category-group';
+
+            const catTitle = document.createElement('div');
+            catTitle.className = 'category-title';
+            catTitle.textContent = category;
+            catGroup.appendChild(catTitle);
+
+            const ul = document.createElement('ul');
+            ul.className = 'item-list';
+
+            categoryItems.forEach(item => {
+                const li = document.createElement('li');
+                li.className = `item ${item.checked ? 'checked' : ''}`;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.checked;
+                checkbox.addEventListener('change', () => toggleCheck(item.id));
+
+                const span = document.createElement('span');
+                span.className = 'item-text';
+                span.textContent = item.name;
+                span.addEventListener('click', () => toggleCheck(item.id));
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.innerHTML = '&times;';
+                delBtn.title = "Supprimer";
+                delBtn.addEventListener('click', () => deleteItem(item.id));
+
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                li.appendChild(delBtn);
+                ul.appendChild(li);
+            });
+
+            catGroup.appendChild(ul);
+            listContainer.appendChild(catGroup);
+        }
+    }
+
+    // Premier rendu au chargement
+    renderList();
+</script>
+
+</body>
+</html>
