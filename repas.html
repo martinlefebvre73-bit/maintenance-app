@@ -752,23 +752,46 @@ import { getAnalytics } from "firebase/analytics";
       measurementId: "G-B19CW33KYT"
   };
 
-  // Initialisation de Firebase & Firestore
+ // Initialisation
   const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-  // Référence au document central dans la BDD
+  const db = getFirestore(app);
   const docRef = doc(db, "planning_repas", "donnees_utilisateur");
 
-  // 2. Synchronisation en TEMPS RÉEL (Écoute des changements)
+  // 2. Écoute en TEMPS RÉEL (Charge et met à jour automatiquement)
   onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       window.meals = data.meals || [];
       window.favorites = data.favorites || [];
-      window.renderGrid();
     } else {
-      // Première initialisation si la BDD est vide
-      saveToCloud();
+      // Données par défaut si la BDD est vide
+      window.meals = defaultMeals;
+      window.favorites = defaultFavorites;
+      window.saveToStorage();
     }
+    window.renderGrid();
+  }, (error) => {
+    console.error("Erreur de lecture Firebase :", error);
+  });
+
+  // 3. Fonction de sauvegarde distante
+  window.saveToStorage = async function() {
+    // Sauvegarde locale de secours
+    localStorage.setItem('weekly_meals', JSON.stringify(window.meals));
+    localStorage.setItem('favorite_recipes', JSON.stringify(window.favorites));
+
+    // Envoi vers Firebase
+    try {
+      await setDoc(docRef, {
+        meals: window.meals,
+        favorites: window.favorites
+      });
+      console.log("Sauvegarde Firebase réussie !");
+    } catch (e) {
+      console.error("Erreur d'écriture Firebase :", e);
+    }
+  };
+</script>
   });
 
   // 3. Fonction pour sauvegarder vers Firebase au lieu du localStorage
